@@ -34,9 +34,7 @@ def load_gen_data(file_path):
             ITEM_CAND.append(item_cand_) # sorted
             ITEM_POS.append(card_[0])
 
-            item_cand_idx_map = {}
-            for idx, item in enumerate(item_cand_):
-                item_cand_idx_map[item] = idx
+            item_cand_idx_map = {item: idx for idx, item in enumerate(item_cand_)}
             card_idx_ = [item_cand_idx_map[item] for item in card_]
             CARD_IDX.append(card_idx_)
             '''
@@ -54,13 +52,12 @@ def get_gen_batch_data(is_training=True):
     # Load data
     if is_training:
         USER, CARD, CARD_IDX, ITEM_CAND, ITEM_POS = load_gen_data(hp.gen_data_train)
-        batch_size = hp.batch_size
         print('Load generator training data done!')
     else:
         USER, CARD, CARD_IDX, ITEM_CAND, ITEM_POS = load_gen_data(hp.gen_data_test)
-        batch_size = hp.batch_size
         print('Load generator testing data done!')
 
+    batch_size = hp.batch_size
     # calc total batch count
     num_batch = len(USER) // batch_size
 
@@ -110,13 +107,12 @@ def get_dis_batch_data(is_training=True):
     # Load data
     if is_training:
         USER, CARD, LABEL = load_dis_data(hp.dis_data_train)
-        batch_size = hp.batch_size
         print('Load discriminator training data done!')
     else:
         USER, CARD, LABEL = load_dis_data(hp.dis_data_test)
-        batch_size = hp.batch_size
         print('Load discriminator testing data done!')
 
+    batch_size = hp.batch_size
     # calc total batch count
     num_batch = len(USER) // batch_size
 
@@ -147,7 +143,7 @@ if __name__ == "__main__":
     print(card_idx)
     print(item_cand)
     print(item_pos)
-    print(str(num_batch))
+    print(num_batch)
 
     user, card, label, num_batch = get_dis_batch_data(is_training=True)
     print(user)

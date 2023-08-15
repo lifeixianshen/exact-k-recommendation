@@ -6,14 +6,14 @@ class Hyperparams:
     # data
     data_set = 'ml100k-10c'
 
-    gen_data_train = 'data/' + data_set + '/rerank_data_10c_train.txt'
-    gen_data_test = 'data/' + data_set + '/rerank_data_10c_test.txt'
+    gen_data_train = f'data/{data_set}/rerank_data_10c_train.txt'
+    gen_data_test = f'data/{data_set}/rerank_data_10c_test.txt'
 
-    dis_data_train = 'data/' + data_set + '/dis_data_10c_train.txt'
-    dis_data_test = 'data/' + data_set + '/dis_data_10c_test.txt'
+    dis_data_train = f'data/{data_set}/dis_data_10c_train.txt'
+    dis_data_test = f'data/{data_set}/dis_data_10c_test.txt'
 
-    user_ids_file = 'data/' + data_set + '/user_ids.txt'
-    item_ids_file = 'data/' + data_set + '/item_ids.txt'
+    user_ids_file = f'data/{data_set}/user_ids.txt'
+    item_ids_file = f'data/{data_set}/item_ids.txt'
 
     # training
     batch_size = 32 # alias = N

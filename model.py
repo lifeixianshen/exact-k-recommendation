@@ -57,7 +57,7 @@ class Generator():
             if hp.use_mha:
                 ## Blocks
                 for i in range(hp.num_blocks):
-                    with tf.variable_scope("num_blocks_{}".format(i)):
+                    with tf.variable_scope(f"num_blocks_{i}"):
                         ### Multihead Attention
                         self.enc = multihead_attention(queries=self.enc,
                                                         keys=self.enc,

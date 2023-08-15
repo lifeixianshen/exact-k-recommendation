@@ -92,10 +92,7 @@ def ptn_rnn_decoder(cell,
                     "bias_dec", [hidden_dim],
                     initializer=tf.zeros_initializer)
                 if len(bef) <= 1:
-                    if len(bef) == 0:
-                        return tf.zeros([batch_size, hidden_dim])
-                    else:
-                        return bef[0]
+                    return tf.zeros([batch_size, hidden_dim]) if len(bef) == 0 else bef[0]
                 else:
                     bef = tf.stack(bef, axis=1)
                     # bef_rs = tf.reduce_sum(bef_s,axis=[2])
@@ -142,10 +139,7 @@ def ptn_rnn_decoder(cell,
                 scores = tf.reduce_sum(v * tf.tanh(encoded_ref + encoded_query + decoded_ref + bias),
                                        [-1])  # [batch, data_len]
 
-                if with_softmax:
-                    return tf.nn.softmax(scores)
-                else:
-                    return scores
+                return tf.nn.softmax(scores) if with_softmax else scores
 
         def glimpse(ref, query, dec_ref, scope="glimpse"):
             """
@@ -201,11 +195,7 @@ def ptn_rnn_decoder(cell,
             :param point_mask: [batch, seq_length]
             :return: [batch_size, seq_length]
             """
-            if input_idx is not None:
-                _input = input_fn(input_idx)  # [batch_size, hidden_dim]
-            else:
-                _input = first_decoder_input
-
+            _input = input_fn(input_idx) if input_idx is not None else first_decoder_input
             cell_output, new_state = cell(_input, state)
             # 先计算 intra-decoder-attention
             intra_dec = intra_attention(output_ref, cell_output)  # [batch_size, hidden_dim]
@@ -237,7 +227,9 @@ def ptn_rnn_decoder(cell,
             elif mode == "GREEDY":
                 sample_fn = greedy_sample_from_logits
             else:
-                raise NotImplementedError("invalid mode: %s. Available modes: [SAMPLE, GREEDY]" % mode)
+                raise NotImplementedError(
+                    f"invalid mode: {mode}. Available modes: [SAMPLE, GREEDY]"
+                )
             output_idx = sample_fn(logits)  # [batch_size]
             output_idxs = [output_idx]
             point_mask = update_mask(output_idx, point_mask)
@@ -347,7 +339,9 @@ def ptn_rnn_decoder(cell,
                     beam_sample(accum_logits, logits, point_mask, state, output_idxs)
             return accum_logits[0], output_idxs[0], state[0]
         else:
-            raise NotImplementedError("unknown mode: %s. Available modes: [SAMPLE, TRAIN, GREEDY, BEAMSEARCH]" % mode)
+            raise NotImplementedError(
+                f"unknown mode: {mode}. Available modes: [SAMPLE, TRAIN, GREEDY, BEAMSEARCH]"
+            )
 
 
 def trainable_initial_state(batch_size,
@@ -356,12 +350,8 @@ def trainable_initial_state(batch_size,
                             name="initial_state"):
     flat_state_size = nest.flatten(state_size)  # Returns a flat sequence from a given nested structure.
 
-    if not initializer:
-        flat_initializer = tuple(tf.zeros_initializer for _ in flat_state_size)
-    else:
-        flat_initializer = tuple(tf.zeros_initializer for initializer in flat_state_size)
-
-    names = ["{}_{}".format(name, i) for i in xrange(len(flat_state_size))]
+    flat_initializer = tuple(tf.zeros_initializer for _ in flat_state_size)
+    names = [f"{name}_{i}" for i in xrange(len(flat_state_size))]
     tiled_states = []
 
     # tiled_ta = tf.ones(shape=[batch_size])
@@ -371,8 +361,9 @@ def trainable_initial_state(batch_size,
             name, shape=shape_with_batch_dim, initializer=init())
 
         # tf.multiply(tiled_ta, initial_state_variable, name=(name + "_tiled"))
-        tiled_state = tf.tile(initial_state_variable,
-                              [batch_size, 1], name=(name + "_tiled"))
+        tiled_state = tf.tile(
+            initial_state_variable, [batch_size, 1], name=f"{name}_tiled"
+        )
         tiled_states.append(tiled_state)
 
     return nest.pack_sequence_as(structure=state_size,

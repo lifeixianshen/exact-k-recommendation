@@ -19,7 +19,7 @@ print('train_size: ', train_size)
 print('test_size: ', test_size)
 
 random.shuffle(data_all)
-data_train = data_all[0 : train_size]
+data_train = data_all[:train_size]
 data_test = data_all[train_size : -1]
 
 
